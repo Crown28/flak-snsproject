@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # 실제 사용 시 안전한 키로 변경해야 합니다.
+app.secret_key = 'your_secret_key'
 
 DATABASE = 'flak.db'
 
