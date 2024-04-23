@@ -62,5 +62,14 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('login'))
 
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+@app.route('/post')
+def post():
+    return render_template('post.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
