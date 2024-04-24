@@ -103,7 +103,7 @@ Portfolio
               <img class="profile-pic" src="{{ post.post_image }}" alt="User Profile Picture">
               <div class="username">{{ post.username }}</div>
             </div>
-            <img src="{{ post.post_image }}" alt="Post Image">           
+            <img src="{{ post.post_image }}" alt="Post Image">
             <div class="post-content">{{ post.content }}</div>
             <div class="comments">Comments: {{ post.comments }}</div>
           </div>
@@ -122,12 +122,12 @@ Portfolio
                 </tr>
             </thead>
             <tbody>
-              {% for user in users %}
-              <tr>
-                  <td><img src="{{ user['profile_image'] }}" alt="User Image" class="user-image"></td>
-                  <td><a href="{{ url_for('user_page', user_id=user['user_id']) }}">{{ user['username'] }}</a></td>
-              </tr>
-              {% endfor %}
+                {% for user in users %}
+                <tr>
+                    <td><img src="https://t1.daumcdn.net/thumb/R720x0/?fname=http://t1.daumcdn.net/brunch/service/user/2D9/image/nGbkJwBs8Ou3Cv5DbxApRbMZ2XQ.jpg" alt="User Image" class="user-image"></td> <!-- 사용자 이미지를 위한 셀 추가 -->
+                    <td>{{ user.username }}</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

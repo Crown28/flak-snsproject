@@ -35,7 +35,8 @@
                             <li class="nav-item"><a class="nav-link" href="/profile">프로필</a></li>
                         </ul>
                         <ul class="navbar-nav ms-auto mt-2">
-                            <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                            
+                            <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Log Out</a></li>
                         </ul>
                     {% else %}
                         <ul class="navbar-nav ms-auto mt-2">
@@ -58,6 +59,31 @@
         <main class="container py-5 text-center">
             {% block main %}{% endblock %}
         </main>
+        <!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="logoutModalLabel">로그아웃 확인</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          정말 로그아웃 하시겠습니까?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" id="confirmLogout">네, 로그아웃합니다</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
     </body>
 
 </html>
+
+<script>
+    document.getElementById('confirmLogout').addEventListener('click', function() {
+      window.location.href = '/logout'; // 로그아웃 처리 URL로 리다이렉트
+    });
+  </script>
