@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 path = os.getcwd()
 UPLOAD_FOLDER = os.path.join(path, 'static', 'image', 'uploads')
 POST_IMGPATH = os.path.join('static', 'image', 'uploads')
+PROFILE_IMGPATH = os.path.join('static', 'image')
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4'}
 
@@ -69,8 +70,8 @@ def main():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     conn = get_db_connection()
-    users = conn.execute('SELECT user_id, username FROM users').fetchall()
-    posts = conn.execute('SELECT posts.*, users.username FROM posts JOIN users ON posts.user_id = users.user_id').fetchall()
+    users = conn.execute('SELECT user_id, username, profile_pic FROM users').fetchall()
+    posts = conn.execute('SELECT posts.*, users.username, users.profile_pic FROM posts JOIN users ON posts.user_id = users.user_id').fetchall()
     conn.close()
     
     return render_template('main.html', users=users, posts=posts)
@@ -83,7 +84,7 @@ def user_page(user_id):
     conn = get_db_connection()
     user = conn.execute('SELECT * FROM users WHERE user_id = ?', (user_id,)).fetchone() # 사용자 ID로, 실제 사용자 ID 값으로 대체해야 합니다.
     user_posts = conn.execute('''
-    SELECT posts.*, users.username
+    SELECT posts.*, users.username, users.profile_pic
     FROM posts
     JOIN users ON posts.user_id = users.user_id
     WHERE posts.user_id = ?
@@ -100,9 +101,67 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('login'))
 
-@app.route('/profile')
+@app.route('/profile', methods=["GET", "POST"])
 def profile():
-    return render_template('profile.html')
+    user_id = session['user_id']
+    
+
+    if request.method == "POST":
+        return redirect("/profile")
+    
+    conn = get_db_connection()
+
+    profile_db = conn.execute("select username, description, profile_pic from USERS where user_id = ?", (user_id,)).fetchone()
+   
+    conn.close()
+    username = profile_db['username']
+    profile_pic = profile_db['profile_pic']
+    description = request.args.get("description")
+
+    return render_template('profile.html', username=username, description=description, profile_pic=profile_pic)
+
+
+@app.route('/edit_profile', methods=["GET", "POST"])
+def edit_profile():
+    conn = get_db_connection()
+    
+    user_id = session["user_id"]
+    
+    if request.method == "POST":
+
+        # 업로드한 프로필 이미지 파일 가져오기
+        uploaded_file = request.files["profile_pic"]
+
+        #파일 업로드 확인 후 업로드된 파일 저장
+        if uploaded_file.filename != '':
+            # 업로드 된 파일 경로 설정
+            file_path = os.path.join('static', 'image', uploaded_file.filename)
+            #파일 저장
+            uploaded_file.save(file_path)
+
+        else:
+            file_path = None
+        
+        # username = conn.execute("select username from users where user_id = ?", (user_id,))
+        description = request.form.get("description")
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET profile_pic = ?, description = ? WHERE user_id = ?", (file_path, description, user_id))
+        conn.commit()
+        conn.close()
+
+        session['description'] = description
+
+        return redirect("/profile")
+        # return render_template("edit_profile.html", description=description)
+
+    else:
+        # profile_db = conn.execute("SELECT username FROM users WHERE user_id = ?", (user_id,)).fetchone()
+        # conn.close()
+        # username = profile_db['username']
+        # profile_image = profile_db['profile_image']
+        # description = request.args.get("description")
+        return render_template('edit_profile.html')
+
 
 @app.route('/post', methods=['GET', 'POST'])
 def post():
