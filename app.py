@@ -88,6 +88,7 @@ def user_page(user_id):
     JOIN users ON posts.user_id = users.user_id
     WHERE posts.user_id = ?
     ''', (user_id,)).fetchall()
+
     conn.close()
     
     return render_template('userpage.html', users=user, posts=user_posts)

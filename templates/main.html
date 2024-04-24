@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}
-Portfolio
+Welcome!
 {% endblock %}
 {% block main %}
 <style>
@@ -23,7 +23,7 @@ Portfolio
     border-radius: 50%; /* 프로필 사진을 원형으로 만듦 */
     object-fit: cover; /* 이미지 비율을 유지하면서 요소에 맞게 조절 */
     margin-right: 10px; /* 프로필 사진과 사용자 이름 사이의 간격 */
-    margin-left: 40px;
+    margin-left: 20px;
   }
   
   .username {
@@ -35,16 +35,18 @@ Portfolio
     height: 100%;
   }
   .sidebar-left, .sidebar-right {
-    width: 20%; /* 좌우 사이드바 너비 */
+    width: 40%; /* 좌우 사이드바 너비 */
     overflow-y: auto;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
     padding: 20px;
+    border-right: 1px solid #ddd; /* 오른쪽에 연한 회색 선 추가 */
   }
   .content {
-    flex: 2; /* 중앙 콘텐츠 영역 너비 조정 */
+    flex: 3; /* 중앙 콘텐츠 영역 너비 조정 */
     overflow-y: auto;
     background-color: white;
     padding: 20px;
+    border-left: 1px solid #ddd; /* 왼쪽에 연한 회색 선 추가 */
   }
   .post {
     background-color: white;
@@ -79,7 +81,7 @@ Portfolio
     float: left;
     clear: both; /* float 속성을 사용한 정렬을 초기화 */
     display: block; 
-    margin-left:40px;
+    margin-left:20px;
     margin-bottom: 10px; /* 요소 사이의 간격 조정 */
 }
 
@@ -105,6 +107,10 @@ Portfolio
             </div>
             <img src="{{ post.post_image }}" alt="Post Image">           
             <div class="post-content">{{ post.content }}</div>
+            <div class="likes">
+              <button class="like-button" data-post-id="{{ post.id }}">Like</button>
+              <span class="like-count">{{ post.likes }}</span>
+            </div>
             <div class="comments">Comments: {{ post.comments }}</div>
           </div>
           {% endfor %}
@@ -118,16 +124,65 @@ Portfolio
             <thead>
                 <tr>
                     <th></th> <!-- 이미지를 위한 헤더 셀 추가 -->
-                    <th>Username</th>
+                    
                 </tr>
             </thead>
             <tbody>
-              {% for user in users %}
-              <tr>
-                  <td><img src="{{ user['profile_image'] }}" alt="User Image" class="user-image"></td>
-                  <td><a href="{{ url_for('user_page', user_id=user['user_id']) }}">{{ user['username'] }}</a></td>
-              </tr>
-              {% endfor %}
+              <nav class="navbar bg-body-tertiary">
+                  <form class="container-fluid" onsubmit="return false;">
+                      <div class="input-group">
+                          <span class="input-group-text" id="basic-addon1">@</span>
+                          <input type="text" class="form-control" id="searchInput" placeholder="Search User" aria-label="Search User" aria-describedby="basic-addon1">
+                      </div>
+                  </form>
+              </nav>
+              
+              <div class="user-list" style="display: none;">
+                <ul>
+                  {% for user in users %}
+                  <li class="user">
+                      <img src="{{ user['profile_image'] }}" alt="User Image" class="user-image">
+                      <a href="{{ url_for('user_page', user_id=user['user_id']) }}">{{ user['username'] }}</a>
+                  </li>
+                  {% endfor %}
+              </ul>
+              </div>
+          </tbody>
+          
+          <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const searchInput = document.getElementById('searchInput');
+                const userList = document.querySelector('.user-list');
+            
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = searchInput.value.toLowerCase();
+                    const users = userList.querySelectorAll('.user');
+                    let found = false;
+            
+                    if (searchTerm === '') {
+                        userList.style.display = 'none';
+                        return;
+                    }
+            
+                    users.forEach(function(user) {
+                        const username = user.textContent.toLowerCase();
+                        if (username.includes(searchTerm)) {
+                            user.style.display = 'block';
+                            found = true;
+                        } else {
+                            user.style.display = 'none';
+                        }
+                    });
+            
+                    // 사용자를 찾지 못한 경우 목록을 숨깁니다.
+                    if (!found) {
+                        userList.style.display = 'none';
+                    } else {
+                        userList.style.display = 'block';
+                    }
+                });
+            });
+            </script>
             </tbody>
         </table>
     </div>
