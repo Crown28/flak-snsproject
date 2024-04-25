@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block title %}
-Portfolio
+Welcome!
 {% endblock %}
 {% block main %}
 <style>
@@ -35,16 +35,18 @@ Portfolio
     height: 100%;
   }
   .sidebar-left, .sidebar-right {
-    width: 20%; /* 좌우 사이드바 너비 */
+    width: 40%; /* 좌우 사이드바 너비 */
     overflow-y: auto;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
     padding: 20px;
+    border-right: 1px solid #ddd; /* 오른쪽에 연한 회색 선 추가 */
   }
   .content {
-    flex: 2; /* 중앙 콘텐츠 영역 너비 조정 */
+    flex: 3; /* 중앙 콘텐츠 영역 너비 조정 */
     overflow-y: auto;
     background-color: white;
     padding: 20px;
+    border-left: 1px solid #ddd; /* 왼쪽에 연한 회색 선 추가 */
   }
   .post {
     background-color: white;
@@ -55,7 +57,17 @@ Portfolio
     box-sizing: border-box; /* padding과 border를 포함한 크기로 지정 */
     
   }
+  .posted {
+    background-color: rgba(215, 210, 210, 0.686);
+    border-radius: 10px;
+  }
+
+  .posted img {
+    margin: auto;
+    
+  }
   .post img {
+    display: flex;
     max-width: 100%;
     border-radius: 10px;
     margin-bottom: 10px; /* 이미지와 post-content 사이의 간격 추가 */
@@ -79,7 +91,7 @@ Portfolio
     float: left;
     clear: both; /* float 속성을 사용한 정렬을 초기화 */
     display: block; 
-    margin-left:40px;
+    margin-left:20px;
     margin-bottom: 10px; /* 요소 사이의 간격 조정 */
 }
 
@@ -97,16 +109,42 @@ Portfolio
     </div>
     <div class="content">
         <div class="posts">
-          {% for post in posts %}
+          {% for post in posts[::-1] %}
           <div class="post">
             <div class="user-profile">
-              <img class="profile-pic" src="{{ post.post_image }}" alt="User Profile Picture">
+              {% if post.profile_pic %}
+                <img class="profile-pic" src="/{{ post.profile_pic }}" alt="User Profile Picture">
+                {% else %}
+                <img class="profile-pic" src="/static/image/default_pic.png" alt="User Profile Picture">
+                {% endif %}
               <div class="username">{{ post.username }}</div>
             </div>
             <img src="\{{ post.post_image }}" alt="Post Image">
             <div class="post-content">{{ post.content }}</div>
             <div class="comments">Comments: {{ post.comments }}</div>
           </div>
+          <div class="add-comment">
+            <form action="/add_comment" method="POST">
+                <input type="hidden" name="post_id" value="{{ post.post_id }}">
+                <textarea name="comment_content" placeholder="댓글을 입력하세요..." required></textarea>
+                <button type="submit">댓글 추가</button>
+            </form>
+        </div>
+        <div class="comments">
+          {% for comment in comments %}
+              {% if comment.post_id == post.post_id %}
+                  <div class="comment">
+                      <span class="comment-username">{{ comment.username }}</span>: {{ comment.comcontent }}
+                  </div>
+              {% endif %}
+          {% endfor %}
+      </div>
+              {% if post.user_id == session.user_id %}
+              <form action="/delete_post" method="POST">
+                  <input type="hidden" name="post_id" value="{{ post.post_id }}">
+                  <button type="submit">Delete</button>
+              </form>
+              {% endif %}
           {% endfor %}
         </div>
       </div>
@@ -114,22 +152,7 @@ Portfolio
   
     </div>
     <div class="sidebar-right">
-        <table>
-            <thead>
-                <tr>
-                    <th></th> <!-- 이미지를 위한 헤더 셀 추가 -->
-                    <th>Username</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in users %}
-                <tr>
-                    <td><img src="https://t1.daumcdn.net/thumb/R720x0/?fname=http://t1.daumcdn.net/brunch/service/user/2D9/image/nGbkJwBs8Ou3Cv5DbxApRbMZ2XQ.jpg" alt="User Image" class="user-image"></td> <!-- 사용자 이미지를 위한 셀 추가 -->
-                    <td>{{ user.username }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        
     </div>
     
     

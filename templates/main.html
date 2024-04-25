@@ -171,7 +171,8 @@ Welcome!
                   <form action="/add_comment" method="POST">
                       <input type="hidden" name="post_id" value="{{ post.post_id }}">
                       <textarea name="comment_content" placeholder="댓글을 입력하세요..." required></textarea>
-                      <button type="submit">댓글 추가</button>
+                      <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>댓글추가</button>
                   </form>
               </div>
               <!-- 댓글 목록 -->
@@ -188,7 +189,8 @@ Welcome!
               {% if post.user_id == session.user_id %}
               <form action="/delete_post" method="POST">
                   <input type="hidden" name="post_id" value="{{ post.post_id }}">
-                  <button type="submit">Delete</button>
+                  <button type="submit" class="btn btn-primary">
+                    Delete</button>
               </form>
               {% endif %}
           </div>

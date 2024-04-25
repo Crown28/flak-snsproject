@@ -99,10 +99,11 @@ def user_page(user_id):
     JOIN users ON posts.user_id = users.user_id
     WHERE posts.user_id = ?
     ''', (user_id,)).fetchall()
+    comments = conn.execute('SELECT users.username, comments.comcontent, comments.post_id FROM comments JOIN users ON comments.user_id = users.user_id JOIN posts ON comments.post_id = posts.post_id').fetchall()
 
     conn.close()
     
-    return render_template('userpage.html', users=user, posts=user_posts)
+    return render_template('userpage.html', users=user, posts=user_posts, comments=comments)
 
 
 
