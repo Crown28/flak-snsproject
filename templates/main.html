@@ -140,6 +140,7 @@ Welcome!
         </a>
         <div class="card-body">
             <h5 class="card-title">어서오세요 {{ username }}님</h5>
+            <p class="card-text">현재상태 : {{description}}</p>
         </div>
       </div>
     </div>
@@ -148,7 +149,11 @@ Welcome!
           {% for post in posts[::-1] %}
           <div class="post">
               <div class="user-profile">
-                  <img class="profile-pic" src="{{ post.profile_pic }}" alt="User Profile Picture">
+                {% if post.profile_pic %}
+                <img class="profile-pic" src="{{ post.profile_pic }}" alt="User Profile Picture">
+                {% else %}
+                <img class="profile-pic" src="/static/image/default_pic.png" alt="User Profile Picture">
+                {% endif %}
                   <div class="username">{{ post.username }}</div>
               </div>
               <div class="posted">

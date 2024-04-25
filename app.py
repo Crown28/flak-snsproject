@@ -73,17 +73,18 @@ def main():
 
     user_id = session.get("user_id")
     cur = conn.cursor()
-    cur.execute('SELECT username, profile_pic FROM users WHERE user_id = ?', (user_id,))
+    cur.execute('SELECT username, profile_pic, description FROM users WHERE user_id = ?', (user_id,))
     profile_db = cur.fetchone()
     username = profile_db['username']
     profile_pic = profile_db['profile_pic']
+    description = profile_db['description']
     users = conn.execute('SELECT user_id, username, profile_pic FROM users').fetchall()
     posts = conn.execute('SELECT posts.*, users.username, users.profile_pic FROM posts JOIN users ON posts.user_id = users.user_id').fetchall()
     comments = conn.execute('SELECT users.username, comments.comcontent, comments.post_id FROM comments JOIN users ON comments.user_id = users.user_id JOIN posts ON comments.post_id = posts.post_id').fetchall()
 
     conn.close()
     
-    return render_template('main.html', username = username, profile_pic = profile_pic, users=users, posts=posts, comments = comments)
+    return render_template('main.html', username = username, profile_pic = profile_pic, users=users, posts=posts, comments = comments, description=description)
 
 @app.route('/user/<int:user_id>')
 def user_page(user_id):
