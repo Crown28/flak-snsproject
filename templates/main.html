@@ -136,7 +136,13 @@ Welcome!
     <div class="sidebar-left">
       <div class="card" style="width: 15rem;">
         <a href="/profile">
-            <img src="{{ profile_pic }}" alt="User Image" class="user-image" style="cursor: pointer;">
+          <div class="user-profile">
+            {% if profile_pic %}
+            <img class="profile-pic" src="{{ profile_pic }}" alt="User Profile Picture">
+            {% else %}
+            <img class="profile-pic" src="/static/image/default_pic.png" alt="User Profile Picture">
+            {% endif %}
+          </div>
         </a>
         <div class="card-body">
             <h5 class="card-title">어서오세요 {{ username }}님</h5>
