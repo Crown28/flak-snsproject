@@ -107,7 +107,7 @@ h1 {
         </div>
     <div>
         <h2>Description</h2>
-        <p>{{ session.get('description', '') }}</p>
+        <p>{{ description }}</p>
         <!-- 기타 소개글 정보를 여기에 추가할 수 있습니다 -->
     </div>
     <a href="{{ url_for('edit_profile') }}" class="edit-profile-btn"><button class="btn btn-primary" type="button">Edit Profile</button></a>
