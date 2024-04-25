@@ -72,6 +72,7 @@ def main():
     conn = get_db_connection()
 
     user_id = session.get("user_id")
+    
     cur = conn.cursor()
     cur.execute('SELECT username, profile_pic, description FROM users WHERE user_id = ?', (user_id,))
     profile_db = cur.fetchone()
@@ -127,7 +128,7 @@ def profile():
     conn.close()
     username = profile_db['username']
     profile_pic = profile_db['profile_pic']
-    description = request.args.get("description")
+    description = profile_db['description']
 
     return render_template('profile.html', username=username, description=description, profile_pic=profile_pic)
 

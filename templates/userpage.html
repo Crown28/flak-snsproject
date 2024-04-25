@@ -23,19 +23,19 @@ Welcome!
     border-radius: 50%; /* 프로필 사진을 원형으로 만듦 */
     object-fit: cover; /* 이미지 비율을 유지하면서 요소에 맞게 조절 */
     margin-right: 10px; /* 프로필 사진과 사용자 이름 사이의 간격 */
-    margin-left: 40px;
+    margin-left: 20px;
   }
   
   .username {
     font-weight: bold; /* 사용자 이름을 굵게 표시 */
-    margin-left: 10px;
+    margin-right: auto;
   }
   .container {
     display: flex;
     height: 100%;
   }
   .sidebar-left, .sidebar-right {
-    width: 40%; /* 좌우 사이드바 너비 */
+    width: 20%; /* 좌우 사이드바 너비 */
     overflow-y: auto;
     background-color: #ffffff;
     padding: 20px;
@@ -86,13 +86,22 @@ Welcome!
   .user-id, .profile-name {
     margin: 10px 0;
   }
-  .post-content,
   .comments {
     float: left;
     clear: both; /* float 속성을 사용한 정렬을 초기화 */
-    display: block; 
+    display: flex; 
+    flex-direction: column;
     margin-left:20px;
     margin-bottom: 10px; /* 요소 사이의 간격 조정 */
+    align-items: flex-start;
+}
+.post-content{
+  float: left;
+  clear: both; /* float 속성을 사용한 정렬을 초기화 */
+  display: flex; 
+  margin-left:20px;
+  margin-bottom: 10px; /* 요소 사이의 간격 조정 */
+  align-items: flex-start;
 }
 
   .sidebar-right img {
@@ -101,13 +110,29 @@ Welcome!
     border-radius: 50%; /* 이미지를 동그랗게 만듦 */
     object-fit: cover; /* 이미지 비율을 유지하면서, 지정된 너비와 높이에 맞춤 */
 }
-.comments {
-  float: left;
-  clear: both; /* float 속성을 사용한 정렬을 초기화 */
-  display: block; 
-  margin-left:20px;
-  margin-bottom: 10px; /* 요소 사이의 간격 조정 */
+.add-comment textarea {
+  width: 100%;
+  height: 30px;
 }
+.user-profile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 내용을 양쪽으로 분산 정렬 */
+}
+
+#user-profile img {
+  margin-right: 10px;
+}
+
+.user-profile form {
+  margin-left: auto; /* delete form을 오른쪽으로 이동 */
+}
+
+#add{
+  margin-left: auto;
+  justify-content: space-between;
+}
+
 </style>
 <body>
   <div class="container">
@@ -115,45 +140,59 @@ Welcome!
       <!-- 왼쪽 사이드바 콘텐츠 -->
     </div>
     <div class="content">
-        <div class="posts">
+      <div class="posts">
           {% for post in posts[::-1] %}
           <div class="post">
-            <div class="user-profile">
-              {% if post.profile_pic %}
+              <div id="user-profile" class="user-profile">
+                {% if post.profile_pic %}
                 <img class="profile-pic" src="/{{ post.profile_pic }}" alt="User Profile Picture">
                 {% else %}
                 <img class="profile-pic" src="/static/image/default_pic.png" alt="User Profile Picture">
                 {% endif %}
-              <div class="username">{{ post.username }}</div>
-            </div>
-            <img src="\{{ post.post_image }}" alt="Post Image">
-            <div class="post-content">{{ post.content }}</div>
-            <div class="comments">Comments: {{ post.comments }}</div>
+                  <div class="username">{{ post.username }}</div>
+              
+                  {% if post.user_id == session.user_id %}
+                <form action="/delete_post" method="POST">
+                    <input type="hidden" name="post_id" value="{{ post.post_id }}">
+                    <button type="submit" class="btn btn-primary">삭제</button>
+                </form>
+              {% endif %}
+              </div>
+              <div class="posted">
+                  <img src="\{{ post.post_image }}" alt="Post Image">           
+                  <div class="post-content"><b>{{ post.username }}</b>&nbsp;{{ post.content }}</div>
+              </div>
+              <!-- 댓글 작성 폼 --><br>
+              <div class="add-comment">
+                  <form action="/add_comment" method="POST">
+                      <input type="hidden" name="post_id" value="{{ post.post_id }}">
+                      <textarea name="comment_content" placeholder="댓글을 입력하세요..." required></textarea>
+                      
+                      <div class="add-comment">
+                        <div class="row">
+                            <div class="col text-end"> <!-- 오른쪽 정렬 -->
+                                <button id="add" type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>댓글추가</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                      
+                  </form>
+              </div>
+              <!-- 댓글 목록 -->
+              <div class="comments">
+                  {% for comment in comments %}
+                      {% if comment.post_id == post.post_id %}
+                          <div class="comment">
+                              <span class="comment-username"><b>{{ comment.username }}</b></span>: {{ comment.comcontent }}
+                          </div>
+                      {% endif %}
+                  {% endfor %}
+              </div>
+              <!-- 게시글 삭제 버튼 -->
           </div>
-          <div class="add-comment">
-            <form action="/add_comment" method="POST">
-                <input type="hidden" name="post_id" value="{{ post.post_id }}">
-                <textarea name="comment_content" placeholder="댓글을 입력하세요..." required></textarea>
-                <button type="submit">댓글 추가</button>
-            </form>
-        </div>
-        <div class="comments">
-          {% for comment in comments %}
-              {% if comment.post_id == post.post_id %}
-                  <div class="comment">
-                      <span class="comment-username">{{ comment.username }}</span>: {{ comment.comcontent }}
-                  </div>
-              {% endif %}
           {% endfor %}
-      </div>
-              {% if post.user_id == session.user_id %}
-              <form action="/delete_post" method="POST">
-                  <input type="hidden" name="post_id" value="{{ post.post_id }}">
-                  <button type="submit">Delete</button>
-              </form>
-              {% endif %}
-          {% endfor %}
-        </div>
       </div>
       
   
