@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import os
@@ -70,11 +70,20 @@ def main():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     conn = get_db_connection()
+
+    user_id = session.get("user_id")
+    cur = conn.cursor()
+    cur.execute('SELECT username, profile_pic FROM users WHERE user_id = ?', (user_id,))
+    profile_db = cur.fetchone()
+    username = profile_db['username']
+    profile_pic = profile_db['profile_pic']
     users = conn.execute('SELECT user_id, username, profile_pic FROM users').fetchall()
     posts = conn.execute('SELECT posts.*, users.username, users.profile_pic FROM posts JOIN users ON posts.user_id = users.user_id').fetchall()
+    comments = conn.execute('SELECT users.username, comments.comcontent, comments.post_id FROM comments JOIN users ON comments.user_id = users.user_id JOIN posts ON comments.post_id = posts.post_id').fetchall()
+
     conn.close()
     
-    return render_template('main.html', users=users, posts=posts)
+    return render_template('main.html', username = username, profile_pic = profile_pic, users=users, posts=posts, comments = comments)
 
 @app.route('/user/<int:user_id>')
 def user_page(user_id):
@@ -214,6 +223,32 @@ def post():
     else:
         # GET 요청 처리
         return render_template('post.html')
+
+
+@app.route('/delete_post', methods=['POST'])
+def delete_post():
+    post_id = request.form['post_id']
+    conn = get_db_connection()
+    conn.execute('DELETE FROM posts WHERE post_id = ?', (post_id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('main'))
+
+@app.route('/add_comment', methods=['POST'])
+def add_comment():
+    if request.method == 'POST':
+        user_id = session["user_id"]
+        post_id = request.form['post_id']
+        comment_content = request.form['comment_content']
+        
+        # 데이터베이스에 댓글 추가하는 코드 작성
+        conn = get_db_connection()
+        conn.execute('INSERT INTO comments (user_id, post_id, comcontent) VALUES (?, ?, ?)', (user_id, post_id, comment_content))
+        conn.commit()
+        conn.close()
+        
+        return redirect(url_for('main'))
+
 
 
 if __name__ == '__main__':
