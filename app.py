@@ -81,7 +81,7 @@ def main():
     description = profile_db['description']
     users = conn.execute('SELECT user_id, username, profile_pic FROM users').fetchall()
     posts = conn.execute('SELECT posts.*, users.username, users.profile_pic FROM posts JOIN users ON posts.user_id = users.user_id').fetchall()
-    comments = conn.execute('SELECT users.username, comments.comcontent, comments.post_id FROM comments JOIN users ON comments.user_id = users.user_id JOIN posts ON comments.post_id = posts.post_id').fetchall()
+    comments = conn.execute('SELECT users.username, comments.comcontent, comments.post_id, comments.user_id FROM comments JOIN users ON comments.user_id = users.user_id JOIN posts ON comments.post_id = posts.post_id').fetchall()
 
     conn.close()
     
@@ -251,7 +251,17 @@ def add_comment():
         conn.close()
         
         return redirect(url_for('main'))
+    
 
+@app.route('/delete_comment', methods=['POST'])
+def delete_comment():
+    comcontent = request.form['comcontent']
+    conn = get_db_connection()
+    print(comcontent)
+    conn.execute('DELETE FROM comments WHERE comcontent = ?', (comcontent,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('main'))
 
 
 if __name__ == '__main__':
